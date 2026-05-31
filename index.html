@@ -69,6 +69,102 @@
             --blur-filter:  blur(3px) opacity(0.55);
         }
 
+        /* SARI TEMA */
+        body.tema-sari {
+            --bg:           #111008;
+            --bg2:          #111008;
+            --kart:         rgba(210,170,0,0.07);
+            --kart-border:  rgba(210,170,0,0.12);
+            --kart-border2: rgba(210,170,0,0.32);
+            --yazi:         #c9a800;
+            --yazi-soluk:   rgba(201,168,0,0.5);
+            --yazi-cok-soluk: rgba(201,168,0,0.35);
+            --modal-bg:     #161208;
+            --input-bg:     rgba(210,170,0,0.07);
+            --secici-bg:    #1c1800;
+            --secici-item-border: #262000;
+            --secici-item-hover:  #302800;
+            --gun-secici-border:  #262000;
+            --tik-border:   rgba(210,170,0,0.35);
+            --tik-check-color: #111008;
+            --tik-check-bg: #c9a800;
+            --gonder-bg:    #c9a800;
+            --gonder-yazi:  #111008;
+            --gonder-active:#b09200;
+            --buton-bg:     rgba(210,170,0,0.07);
+            --buton-active: rgba(210,170,0,0.13);
+            --secili-gun-bg:rgba(210,170,0,0.11);
+            --secili-gun-border: rgba(210,170,0,0.24);
+            --gun-ok:       #6b5800;
+            --pp-yazi:      rgba(201,168,0,0.82);
+            --pp-p:         rgba(201,168,0,0.60);
+            --blur-filter:  blur(3px) opacity(0.55);
+        }
+
+        /* TURKUAZ TEMA */
+        body.tema-mavi {
+            --bg:           #080f12;
+            --bg2:          #080f12;
+            --kart:         rgba(0,180,160,0.07);
+            --kart-border:  rgba(0,180,160,0.13);
+            --kart-border2: rgba(0,180,160,0.35);
+            --yazi:         #00a896;
+            --yazi-soluk:   rgba(0,168,150,0.5);
+            --yazi-cok-soluk: rgba(0,168,150,0.35);
+            --modal-bg:     #0a1416;
+            --input-bg:     rgba(0,180,160,0.07);
+            --secici-bg:    #0d1a1c;
+            --secici-item-border: #122224;
+            --secici-item-hover:  #182e30;
+            --gun-secici-border:  #122224;
+            --tik-border:   rgba(0,180,160,0.38);
+            --tik-check-color: #080f12;
+            --tik-check-bg: #00a896;
+            --gonder-bg:    #00a896;
+            --gonder-yazi:  #ffffff;
+            --gonder-active:#008a7a;
+            --buton-bg:     rgba(0,180,160,0.07);
+            --buton-active: rgba(0,180,160,0.14);
+            --secili-gun-bg:rgba(0,180,160,0.11);
+            --secili-gun-border: rgba(0,180,160,0.26);
+            --gun-ok:       #005c54;
+            --pp-yazi:      rgba(0,168,150,0.82);
+            --pp-p:         rgba(0,168,150,0.62);
+            --blur-filter:  blur(3px) opacity(0.55);
+        }
+
+        /* KIRMIZI TEMA */
+        body.tema-kirmizi {
+            --bg:           #100808;
+            --bg2:          #100808;
+            --kart:         rgba(200,50,40,0.07);
+            --kart-border:  rgba(200,50,40,0.13);
+            --kart-border2: rgba(200,50,40,0.35);
+            --yazi:         #b84040;
+            --yazi-soluk:   rgba(184,64,64,0.5);
+            --yazi-cok-soluk: rgba(184,64,64,0.35);
+            --modal-bg:     #160a0a;
+            --input-bg:     rgba(200,50,40,0.07);
+            --secici-bg:    #1c0e0e;
+            --secici-item-border: #261414;
+            --secici-item-hover:  #301a1a;
+            --gun-secici-border:  #261414;
+            --tik-border:   rgba(200,50,40,0.35);
+            --tik-check-color: #100808;
+            --tik-check-bg: #b84040;
+            --gonder-bg:    #b84040;
+            --gonder-yazi:  #ffffff;
+            --gonder-active:#9a3030;
+            --buton-bg:     rgba(200,50,40,0.07);
+            --buton-active: rgba(200,50,40,0.14);
+            --secili-gun-bg:rgba(200,50,40,0.11);
+            --secili-gun-border: rgba(200,50,40,0.26);
+            --gun-ok:       #5c2020;
+            --pp-yazi:      rgba(184,64,64,0.82);
+            --pp-p:         rgba(184,64,64,0.62);
+            --blur-filter:  blur(3px) opacity(0.55);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -636,6 +732,30 @@
         .menü-acik .menu-simgesi span { background-color: var(--yazi); }
         .menü-acik .ana-alan { background-color: var(--bg2); }
 
+        /* Renkli temalar üzerinde arka plan override */
+        body.tema-sari.arkaplan-siyah,
+        body.tema-mavi.arkaplan-siyah,
+        body.tema-kirmizi.arkaplan-siyah {
+            --bg:       #000000;
+            --bg2:      #000000;
+            --modal-bg: #000000;
+            --secici-bg: #111111;
+            --secici-item-border: #1a1a1a;
+            --secici-item-hover:  #222222;
+            --gun-secici-border:  #1a1a1a;
+        }
+        body.tema-sari.arkaplan-beyaz,
+        body.tema-mavi.arkaplan-beyaz,
+        body.tema-kirmizi.arkaplan-beyaz {
+            --bg:       #f2f2f7;
+            --bg2:      #f2f2f7;
+            --modal-bg: #ffffff;
+            --secici-bg: #e8e8ed;
+            --secici-item-border: #d0d0d5;
+            --secici-item-hover:  #d0d0d5;
+            --gun-secici-border:  #c8c8cc;
+        }
+
         /* Ayarlar butonu */
         .ayarlar-btn {
             margin-left: auto;
@@ -685,52 +805,106 @@
         }
         .renk-secenekler {
             display: flex;
-            gap: 14px;
+            gap: 8px;
             align-items: center;
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 4px;
         }
         .renk-kutu {
             flex: 1;
-            height: 52px;
-            border-radius: 12px;
+            height: 36px;
+            border-radius: 9px;
             cursor: pointer;
-            border: 2.5px solid transparent;
-            transition: border-color 0.2s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-            overflow: hidden;
+            border: 1.5px solid transparent;
+            transition: background-color 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 6px;
         }
-        .renk-kutu:active { transform: scale(0.92); }
-        .renk-kutu.secili { border-color: #007aff; }
+        .renk-kutu:active { transform: scale(0.94); }
+        .renk-kutu.secili {
+            box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+        }
 
-        /* Siyah kutu: gerçek siyah arka plan */
+        /* Siyah pill */
         .renk-kutu-siyah {
-            background: #111111;
-            border: 2.5px solid #333;
+            background: transparent;
         }
-        /* Beyaz kutu: gerçek beyaz arka plan */
+        .renk-kutu-siyah.secili {
+            background: #1c1c1e;
+            border-color: rgba(255,255,255,0.12);
+        }
+        /* Beyaz pill */
         .renk-kutu-beyaz {
-            background: #f2f2f7;
-            border: 2.5px solid #d0d0d5;
+            background: transparent;
         }
-        /* Otomatik: yarı siyah yarı beyaz */
+        .renk-kutu-beyaz.secili {
+            background: #f2f2f7;
+            border-color: rgba(0,0,0,0.10);
+        }
+        /* Otomatik pill */
         .renk-kutu-otomatik {
-            background: linear-gradient(135deg, #111111 50%, #f2f2f7 50%);
-            border: 2.5px solid rgba(128,128,128,0.4);
+            background: transparent;
+        }
+        .renk-kutu-otomatik.secili {
+            background: var(--buton-active);
+            border-color: var(--kart-border);
         }
 
-        /* Kutu içi etiket */
-        .renk-kutu-label {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+        /* Pill içi kare + etiket */
+        .renk-kutu-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
             pointer-events: none;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
-        .renk-kutu-siyah .renk-kutu-label { color: #ffffff; }
-        .renk-kutu-beyaz .renk-kutu-label { color: #000000; text-shadow: none; }
-        .renk-kutu-otomatik .renk-kutu-label { color: transparent; }
+        .renk-kutu-siyah .renk-kutu-dot {
+            background: #1c1c1e;
+            border: 1.5px solid rgba(255,255,255,0.25);
+        }
+        .renk-kutu-beyaz .renk-kutu-dot {
+            background: #f2f2f7;
+            border: 1.5px solid rgba(0,0,0,0.18);
+        }
+        .renk-kutu-otomatik .renk-kutu-dot {
+            background: linear-gradient(135deg, #1c1c1e 50%, #f2f2f7 50%);
+            border: none;
+        }
+        .renk-kutu-sari .renk-kutu-dot {
+            background: #c9a800;
+            border: none;
+        }
+        .renk-kutu-mavi .renk-kutu-dot {
+            background: #00a896;
+            border: none;
+        }
+        .renk-kutu-kirmizi .renk-kutu-dot {
+            background: #b84040;
+            border: none;
+        }
+        .renk-kutu-sari.secili {
+            background: #2a2200;
+            border-color: rgba(255,210,0,0.2);
+        }
+        .renk-kutu-mavi.secili {
+            background: #001d36;
+            border-color: rgba(0,122,255,0.25);
+        }
+        .renk-kutu-kirmizi.secili {
+            background: #2a0000;
+            border-color: rgba(255,59,48,0.25);
+        }
+            font-weight: 600;
+            letter-spacing: 0.1px;
+            pointer-events: none;
+            color: var(--yazi);
+            opacity: 0.7;
+        }
+        .renk-kutu.secili .renk-kutu-label { opacity: 1; }
 
         .ayarlar-ok-btn {
             background-color: var(--gonder-bg);
@@ -1149,20 +1323,31 @@
             <div class="ayarlar-baslik">Tema</div>
             <div class="renk-secenekler">
                 <div class="renk-kutu renk-kutu-siyah" id="renkSiyah" onclick="temaAyarla('siyah')">
+                    <span class="renk-kutu-dot"></span>
                     <span class="renk-kutu-label">Siyah</span>
                 </div>
                 <div class="renk-kutu renk-kutu-beyaz" id="renkBeyaz" onclick="temaAyarla('beyaz')">
+                    <span class="renk-kutu-dot"></span>
                     <span class="renk-kutu-label">Beyaz</span>
                 </div>
                 <div class="renk-kutu renk-kutu-otomatik" id="renkOtomatik" onclick="temaAyarla('otomatik')">
-                    <span class="renk-kutu-label"></span>
+                    <span class="renk-kutu-dot"></span>
+                    <span class="renk-kutu-label">Otomatik</span>
                 </div>
             </div>
-            <!-- Otomatik etiketi ayrı -->
-            <div style="display:flex;gap:14px;margin-top:-12px;">
-                <div style="flex:1;text-align:center;font-size:11px;color:var(--yazi-soluk);font-weight:600;"></div>
-                <div style="flex:1;text-align:center;font-size:11px;color:var(--yazi-soluk);font-weight:600;"></div>
-                <div style="flex:1;text-align:center;font-size:11px;color:var(--yazi-soluk);font-weight:600;">Otomatik</div>
+            <div class="renk-secenekler">
+                <div class="renk-kutu renk-kutu-sari" id="renkSari" onclick="temaAyarla('sari')">
+                    <span class="renk-kutu-dot"></span>
+                    <span class="renk-kutu-label">Sarı</span>
+                </div>
+                <div class="renk-kutu renk-kutu-mavi" id="renkMavi" onclick="temaAyarla('mavi')">
+                    <span class="renk-kutu-dot"></span>
+                    <span class="renk-kutu-label">Turkuaz</span>
+                </div>
+                <div class="renk-kutu renk-kutu-kirmizi" id="renkKirmizi" onclick="temaAyarla('kirmizi')">
+                    <span class="renk-kutu-dot"></span>
+                    <span class="renk-kutu-label">Kırmızı</span>
+                </div>
             </div>
 
             <!-- Zaman -->
@@ -1349,43 +1534,85 @@
 
         // ── TEMA SİSTEMİ ──
         let mevcutTema = localStorage.getItem('tema') || 'otomatik';
+        // Son seçilen arka plan teması (siyah/beyaz/otomatik)
+        let sonArkaPlan = localStorage.getItem('sonArkaPlan') || 'siyah';
 
         function sisteminKaranlikMi() {
             return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
 
-        function temaUygula(tema) {
-            if (tema === 'beyaz') {
-                document.body.classList.add('tema-beyaz');
-            } else if (tema === 'siyah') {
-                document.body.classList.remove('tema-beyaz');
-            } else {
-                // otomatik
-                if (sisteminKaranlikMi()) {
-                    document.body.classList.remove('tema-beyaz');
-                } else {
-                    document.body.classList.add('tema-beyaz');
-                }
+        const renkliTemalar = ['sari', 'mavi', 'kirmizi'];
+
+        function arkaPlaniUygula() {
+            document.body.classList.remove('arkaplan-siyah', 'arkaplan-beyaz');
+            let etkinArkaPlan = sonArkaPlan;
+            if (etkinArkaPlan === 'otomatik') {
+                etkinArkaPlan = sisteminKaranlikMi() ? 'siyah' : 'beyaz';
+            }
+            if (renkliTemalar.includes(mevcutTema)) {
+                document.body.classList.add('arkaplan-' + etkinArkaPlan);
             }
         }
 
+        function temaUygula(tema) {
+            const tumTemalar = ['beyaz','sari','mavi','kirmizi'];
+            tumTemalar.forEach(t => document.body.classList.remove('tema-' + t));
+            document.body.classList.remove('arkaplan-siyah', 'arkaplan-beyaz');
+            if (tema === 'beyaz') {
+                document.body.classList.add('tema-beyaz');
+            } else if (tema === 'sari') {
+                document.body.classList.add('tema-sari');
+            } else if (tema === 'mavi') {
+                document.body.classList.add('tema-mavi');
+            } else if (tema === 'kirmizi') {
+                document.body.classList.add('tema-kirmizi');
+            } else if (tema === 'siyah') {
+                // zaten varsayılan, sınıf yok
+            } else {
+                // otomatik
+                if (!sisteminKaranlikMi()) {
+                    document.body.classList.add('tema-beyaz');
+                }
+            }
+            arkaPlaniUygula();
+        }
+
         function temaAyarla(tema) {
-            mevcutTema = tema;
-            localStorage.setItem('tema', tema);
-            temaUygula(tema);
-            ['siyah','beyaz','otomatik'].forEach(t => {
+            const renkliAyniSecildi = renkliTemalar.includes(tema) && tema === mevcutTema;
+
+            if (renkliAyniSecildi) {
+                // Renkli tema üstüne tekrar tıklandı → kapat, son arka plana dön
+                mevcutTema = sonArkaPlan;
+                localStorage.setItem('tema', mevcutTema);
+            } else {
+                // Yeni tema seçildi
+                if (!renkliTemalar.includes(tema)) {
+                    // Siyah/beyaz/otomatik seçildi → arka planı güncelle
+                    sonArkaPlan = tema;
+                    localStorage.setItem('sonArkaPlan', sonArkaPlan);
+                }
+                mevcutTema = tema;
+                localStorage.setItem('tema', tema);
+            }
+
+            temaUygula(mevcutTema);
+            ['siyah','beyaz','otomatik','sari','mavi','kirmizi'].forEach(t => {
                 const el = document.getElementById('renk' + t.charAt(0).toUpperCase() + t.slice(1));
-                if (el) el.classList.toggle('secili', t === tema);
+                if (el) el.classList.toggle('secili', t === mevcutTema);
             });
         }
 
         // Sistem teması değişince otomatik modda güncelle
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            if (mevcutTema === 'otomatik') temaUygula('otomatik');
+            if (mevcutTema === 'otomatik' || renkliTemalar.includes(mevcutTema)) temaUygula(mevcutTema);
         });
 
         // İlk yüklemede temayı uygula
         temaUygula(mevcutTema);
+        ['siyah','beyaz','otomatik','sari','mavi','kirmizi'].forEach(t => {
+            const el = document.getElementById('renk' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (el) el.classList.toggle('secili', t === mevcutTema);
+        });
 
         function hafizayaKaydet() {
             localStorage.setItem('aktifRandevular', JSON.stringify(aktifRandevular));
