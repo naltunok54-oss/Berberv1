@@ -954,54 +954,83 @@
 
 
         /* Onay popup */
-        .onay-popup {
+        .onay-overlay {
             position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
             z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.22s ease;
+        }
+        .onay-overlay.acik {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .onay-popup {
             background: var(--modal-bg);
             border: 1.5px solid var(--kart-border2);
-            border-radius: 14px;
-            padding: 12px 16px;
+            border-radius: 20px;
+            padding: 24px 24px 20px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+            gap: 18px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.55);
             opacity: 0;
-            transform: scale(0.92);
-            transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.34,1.4,0.64,1);
+            transform: scale(0.93);
+            transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34,1.4,0.64,1);
             pointer-events: none;
-            min-width: 200px;
+            width: 82%;
+            max-width: 340px;
         }
-        .onay-popup.acik {
+        .onay-overlay.acik .onay-popup {
             opacity: 1;
             transform: scale(1);
             pointer-events: all;
         }
         .onay-popup-yazi {
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--yazi);
-            flex: 1;
+            text-align: center;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .onay-butonlar {
+            display: flex;
+            gap: 10px;
+            width: 100%;
         }
         .onay-evet {
             background: #ff4d4d;
             color: #fff;
             border: none;
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 13px;
+            border-radius: 12px;
+            padding: 13px 0;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
+            flex: 1;
+            transition: background 0.15s, transform 0.12s;
         }
+        .onay-evet:active { background: #e03030; transform: scale(0.97); }
         .onay-hayir {
             background: var(--buton-bg);
             color: var(--yazi);
             border: 1.5px solid var(--kart-border);
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 13px;
+            border-radius: 12px;
+            padding: 13px 0;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
+            flex: 1;
+            transition: background 0.15s, transform 0.12s;
         }
+        .onay-hayir:active { background: var(--buton-active); transform: scale(0.97); }
         /* Hata mesajı */
         .hata-mesaj {
             color: #ff4d4d;
@@ -1194,10 +1223,14 @@
     </div>
 
     <!-- Onay Popup -->
-    <div class="onay-popup" id="onayPopup">
-        <span class="onay-popup-yazi">Silinsin mi?</span>
-        <button class="onay-hayir" id="onayHayir">Hayır</button>
-        <button class="onay-evet" id="onayEvet">Evet</button>
+    <div class="onay-overlay" id="onayOverlay">
+        <div class="onay-popup" id="onayPopup">
+            <span class="onay-popup-yazi" id="onayPopupYazi">Silinsin mi?</span>
+            <div class="onay-butonlar">
+                <button class="onay-hayir" id="onayHayir">Hayır</button>
+                <button class="onay-evet" id="onayEvet">Evet</button>
+            </div>
+        </div>
     </div>
 
     <!-- Drum Saat Seçici -->
@@ -1362,6 +1395,28 @@
             localStorage.setItem('musteriGecmisi', JSON.stringify(musteriGecmisi));
         }
 
+        // Seçilen gün adına göre gerçek takvim tarihi döndürür. Geçmişe gitmez.
+        function gunTarihiHesapla(gunAdi) {
+            const gunSirasi = { "Pazartesi":1,"Salı":2,"Çarşamba":3,"Perşembe":4,"Cuma":5,"Cumartesi":6,"Pazar":7 };
+            const bugun = new Date();
+            const bugunNo = bugun.getDay() === 0 ? 7 : bugun.getDay();
+            const hedefNo = gunSirasi[gunAdi] || 1;
+            const buHaftaPzt = new Date(bugun);
+            buHaftaPzt.setDate(bugun.getDate() - bugunNo + 1);
+            buHaftaPzt.setHours(0,0,0,0);
+            const buHaftaHedef = new Date(buHaftaPzt);
+            buHaftaHedef.setDate(buHaftaPzt.getDate() + hedefNo - 1);
+            const bugunSifir = new Date(bugun); bugunSifir.setHours(0,0,0,0);
+            if (buHaftaHedef < bugunSifir) {
+                buHaftaHedef.setDate(buHaftaHedef.getDate() + 7);
+            }
+            return buHaftaHedef;
+        }
+
+        function gunHaftaKeyiHesapla(gunAdi) {
+            return haftaKey(gunTarihiHesapla(gunAdi));
+        }
+
         function menuTetikle(event) {
             if (event) { event.preventDefault(); event.stopPropagation(); }
             arayuzModu = "ana_liste"; acikGun = null; acikMusteri = null;
@@ -1470,14 +1525,37 @@
             document.getElementById('gunSeciciOverlay').classList.remove('acik');
         }
 
+        // Seçilen gün için gerçek takvim tarihini hesapla (geçmişe gitmez, max 1 hafta ileri)
+        function gunTarihiHesapla(gunAdi) {
+            const gunSiralamasi = { "Pazartesi": 1, "Salı": 2, "Çarşamba": 3, "Perşembe": 4, "Cuma": 5, "Cumartesi": 6, "Pazar": 0 };
+            const bugun = new Date();
+            bugun.setHours(0, 0, 0, 0);
+            const bugunNo = bugun.getDay(); // 0=Pazar
+            const hedefNo = gunSiralamasi[gunAdi];
+            let fark = hedefNo - bugunNo;
+            if (fark < 0) fark += 7; // geçtiyse gelecek haftaya
+            if (fark === 0) fark = 0; // bugün
+            const hedef = new Date(bugun);
+            hedef.setDate(bugun.getDate() + fark);
+            return hedef;
+        }
+
         function paneliAc(event) {
             if (document.body.classList.contains('menü-acik')) return;
             if (event) { event.preventDefault(); event.stopPropagation(); }
             const acikGunler = GUNLER.filter(g => !kapaliGunler.includes(g));
+            if (acikGunler.length === 0) return; // Tüm günler kapalı
             const bugunStr = bugunAdi();
-            secilenGun = acikGunler.includes(bugunStr) ? bugunStr : (acikGunler[0] || GUNLER[0]);
+            const bugunKapali = kapaliGunler.includes(bugunStr);
+            secilenGun = bugunKapali ? acikGunler[0] : bugunStr;
             secilenSaat = null;
-            document.getElementById('gunEtiketi').textContent = secilenGun;
+            if (bugunKapali) {
+                document.getElementById('gunEtiketi').innerHTML = 'Bugün Kapalı &nbsp;<span style="font-size:13px;color:#ff6b6b;font-weight:600;">(' + bugunStr + ')</span>';
+                secilenGun = acikGunler[0];
+                document.getElementById('gunEtiketi').textContent = acikGunler[0];
+            } else {
+                document.getElementById('gunEtiketi').textContent = bugunStr;
+            }
             document.getElementById('saatGosterge').textContent = 'Saat Seç';
             document.getElementById('saatGosterge').style.opacity = '0.4';
             document.getElementById('musteriIsim').value = '';
@@ -1590,14 +1668,26 @@
                 _degistirmeEskiId = null;
             }
             const bugun = secilenGun;
-            const bugunTarihStr = new Date().toLocaleDateString('tr-TR');
+            // Gerçek takvim tarihini hesapla (geçmişe gitmez)
+            const hedefTarih = gunTarihiHesapla(bugun);
+            const bugunTarihStr = hedefTarih.toLocaleDateString('tr-TR');
+            const hedefHaftaKey = haftaKey(hedefTarih);
             const yeniRandevu = { id: Date.now(), isim, saat: tamSaat, telefon, gun: bugun, tarih: bugunTarihStr };
             aktifRandevular.push(yeniRandevu);
             aktifRandevular.sort((a, b) => a.saat.localeCompare(b.saat));
-            if (!tarihRandevular[bugun]) tarihRandevular[bugun] = [];
-            tarihRandevular[bugun].push(yeniRandevu);
-            tarihRandevular[bugun].sort((a, b) => a.saat.localeCompare(b.saat));
-            haftaRandevular[buHaftaKey] = tarihRandevular;
+            // Doğru hafta key'ine yaz
+            if (!haftaRandevular[hedefHaftaKey]) {
+                haftaRandevular[hedefHaftaKey] = {};
+                GUNLER.forEach(g => { haftaRandevular[hedefHaftaKey][g] = []; });
+            }
+            if (!haftaRandevular[hedefHaftaKey][bugun]) haftaRandevular[hedefHaftaKey][bugun] = [];
+            haftaRandevular[hedefHaftaKey][bugun].push(yeniRandevu);
+            haftaRandevular[hedefHaftaKey][bugun].sort((a, b) => a.saat.localeCompare(b.saat));
+            // Bu haftaysa tarihRandevular'ı da güncelle
+            if (hedefHaftaKey === buHaftaKey) {
+                if (!tarihRandevular[bugun]) tarihRandevular[bugun] = [];
+                tarihRandevular[bugun] = haftaRandevular[buHaftaKey][bugun];
+            }
             const _mevcutAnahtar = Object.keys(musteriGecmisi).find(k => k.toLowerCase() === isim.toLowerCase());
             const _anahtar = _mevcutAnahtar || isim;
             if (!musteriGecmisi[_anahtar]) {
@@ -1791,38 +1881,38 @@
         // ── ONAY POPUP ──
         let _onayCallback = null;
 
-        function onayla(event, callback) {
+        function onayla(event, callback, mesaj) {
             if (event) event.stopPropagation();
             _onayCallback = callback;
-            const popup = document.getElementById('onayPopup');
-            // Tıklanan elementin yanına konumlandır
-            const rect = event.target.getBoundingClientRect();
-            const popupW = 220;
-            let left = rect.left - popupW - 8;
-            if (left < 8) left = rect.right + 8;
-            let top = rect.top + window.scrollY - 8;
-            const maxTop = window.innerHeight - 70;
-            if (top > maxTop) top = maxTop;
-            popup.style.left = left + 'px';
-            popup.style.top = top + 'px';
-            popup.classList.add('acik');
+            const overlay = document.getElementById('onayOverlay');
+            const yazEl = document.getElementById('onayPopupYazi');
+            yazEl.textContent = mesaj || 'Silinsin mi?';
+            overlay.style.display = 'flex';
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                overlay.classList.add('acik');
+            }));
+        }
+
+        function onayKapat() {
+            const overlay = document.getElementById('onayOverlay');
+            overlay.classList.remove('acik');
+            setTimeout(() => { overlay.style.display = 'none'; }, 230);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('onayEvet').onclick = (e) => {
                 e.stopPropagation();
-                document.getElementById('onayPopup').classList.remove('acik');
+                onayKapat();
                 if (_onayCallback) { _onayCallback(); _onayCallback = null; }
             };
             document.getElementById('onayHayir').onclick = (e) => {
                 e.stopPropagation();
-                document.getElementById('onayPopup').classList.remove('acik');
+                onayKapat();
                 _onayCallback = null;
             };
-            document.addEventListener('click', (e) => {
-                const popup = document.getElementById('onayPopup');
-                if (!popup.contains(e.target)) {
-                    popup.classList.remove('acik');
+            document.getElementById('onayOverlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('onayOverlay')) {
+                    onayKapat();
                     _onayCallback = null;
                 }
             });
@@ -1868,14 +1958,18 @@
 
         function drumAc() {
             const saatler = saatListesiUret();
-            const gunRandevular = tarihRandevular[secilenGun] || [];
+            // Seçilen günün gerçek hafta key'inden randevuları al
+            const _secilenGunTarih = gunTarihiHesapla(secilenGun);
+            const _secilenGunHaftaKey = haftaKey(_secilenGunTarih);
+            const gunRandevular = (haftaRandevular[_secilenGunHaftaKey] && haftaRandevular[_secilenGunHaftaKey][secilenGun]) ? haftaRandevular[_secilenGunHaftaKey][secilenGun] : [];
             const doluSaatler = new Set(gunRandevular.map(r => r.saat));
 
-            // Geçmiş saat engeli
+            // Geçmiş saat engeli - sadece bugün seçilmişse ve gerçek tarih bugünse
             const bugunStr = bugunAdi();
             let gecmisEngelDk = -1;
-
-            if (secilenGun === bugunStr) {
+            const _bugununTarihi = new Date(); _bugununTarihi.setHours(0,0,0,0);
+            const _secilenGercekTarih = gunTarihiHesapla(secilenGun);
+            if (_secilenGercekTarih.getTime() === _bugununTarihi.getTime()) {
                 const simdi = new Date();
                 gecmisEngelDk = simdi.getHours() * 60 + simdi.getMinutes();
             }
@@ -2119,7 +2213,13 @@
                 copButonu.textContent = 'Çöp Kutusu'; cizelgeButonu.textContent = 'Boş/Dolu Çizelgesi'; tarihButonu.textContent = 'Tarih';
                 fadeGosterBlock(musterilerButonu); musterilerButonu.textContent = 'Müşteriler';
                 eskiTarihButonu.style.display = 'none';
-                fadeGosterBlock(bugunButonu); bugunButonu.textContent = 'Bugün';
+                fadeGosterBlock(bugunButonu);
+                const _bugunAdiAna = bugunAdi();
+                if (kapaliGunler.includes(_bugunAdiAna)) {
+                    bugunButonu.innerHTML = 'Bugün <span style="color:#ff6b6b;font-size:13px;font-weight:600;">(Kapalı)</span>';
+                } else {
+                    bugunButonu.textContent = 'Bugün';
+                }
                 return;
             }
 
@@ -2136,7 +2236,7 @@
                     kart.innerHTML = `<div class="kart-sol-blok"><span>${randevu.isim}</span>${telHtml}${randevu.telefon ? `<div style="display:flex;gap:6px;margin-top:4px;">${araHtml}${mesajHtml}</div>` : ''}</div>
                         <div class="kart-sag-blok"><span class="kart-saat"><span class="kart-saat-saat">${randevu.saat}</span>${randevu.tarih ? `<span class="kart-saat-tarih">${randevu.tarih}</span>` : ""}</span>
                         <div class="donustur-kutusu" onclick="randevuGeriDonustur(${randevu.id}, event)"></div>
-                        <div class="cop-kutusu" onclick="onayla(event, () => kaliciSil(${randevu.id}))"></div></div>`;
+                        <div class="cop-kutusu" onclick="onayla(event, () => kaliciSil(${randevu.id}), '${randevu.isim} — ${randevu.saat}\\nkalıcı silinsin mi?')"></div></div>`;
                     copContainer.appendChild(kart);
                 });
             }
@@ -2167,12 +2267,29 @@
                                 e.stopPropagation();
                                 if (kapaliGunler.includes(gun)) {
                                     kapaliGunler = kapaliGunler.filter(g => g !== gun);
+                                    localStorage.setItem('kapaliGunler', JSON.stringify(kapaliGunler));
+                                    listeleriGuncelle();
                                 } else {
-                                    kapaliGunler.push(gun);
-                                    if (acikGun === gun) acikGun = null;
+                                    const gunRandevuSayisi = (tarihRandevular[gun] || []).length;
+                                    const _kapatVeTemizle = () => {
+                                        kapaliGunler.push(gun);
+                                        if (acikGun === gun) acikGun = null;
+                                        const gunRandevuIds = (tarihRandevular[gun] || []).map(r => r.id);
+                                        gunRandevuIds.forEach(id => {
+                                            const r = [...aktifRandevular, ...bittiRandevular].find(r => r.id === id);
+                                            if (r) silinenRandevular.push(r);
+                                            herYerdenKaldir(id);
+                                        });
+                                        hafizayaKaydet();
+                                        localStorage.setItem('kapaliGunler', JSON.stringify(kapaliGunler));
+                                        listeleriGuncelle();
+                                    };
+                                    if (gunRandevuSayisi > 0) {
+                                        onayla(e, _kapatVeTemizle, gun + ' günü kapatılacak ve ' + gunRandevuSayisi + ' randevu silinecek. Emin misin?');
+                                    } else {
+                                        _kapatVeTemizle();
+                                    }
                                 }
-                                localStorage.setItem('kapaliGunler', JSON.stringify(kapaliGunler));
-                                listeleriGuncelle();
                             };
                             satirEl.appendChild(btn);
                         });
@@ -2214,7 +2331,7 @@
                                     paneliAcSaatle(gun, saatStr, bulunan.id);
                                 };
                                 satir.querySelector('.cop-kutusu').onclick = (e) => {
-                                    onayla(e, () => randevuyuSil(bulunan.id, aktifRandevular.find(r=>r.id===bulunan.id) ? 'aktif' : 'bitti'));
+                                    onayla(e, () => randevuyuSil(bulunan.id, aktifRandevular.find(r=>r.id===bulunan.id) ? 'aktif' : 'bitti'), `${bulunan.isim} — ${saatStr}\nsilinsin mi?`);
                                 };
                             } else {
                                 satir.innerHTML = `<span>${saatStr}</span>
@@ -2277,7 +2394,7 @@
                                             let mesajHtml = randevu.telefon ? `<a href="sms:${randevu.telefon}" class="mesaj-kutusu" onclick="event.stopPropagation()"></a>` : '';
                                             kart.innerHTML = `<div class="kart-sol-blok"><span>${randevu.isim}</span>${telHtml}${randevu.telefon ? `<div style="display:flex;gap:6px;margin-top:4px;">${araHtml}${mesajHtml}</div>` : ''}</div>
                                                 <div class="kart-sag-blok"><span class="kart-saat"><span class="kart-saat-saat">${randevu.saat}</span>${randevu.tarih ? `<span class="kart-saat-tarih">${randevu.tarih}</span>` : ""}</span>
-                                                ${hKey === buHaftaKey ? `<div class="cop-kutusu" onclick="onayla(event, () => tarihtenSil('${gun}', ${randevu.id}, '${hKey}'))"></div>` : ''}
+                                                ${hKey === buHaftaKey ? `<div class="cop-kutusu" onclick="onayla(event, () => tarihtenSil('${gun}', ${randevu.id}, '${hKey}'), '${randevu.isim} — ${randevu.saat}\\nsilinsin mi?')"></div>` : ''}
                                                 </div>`;
                                             musteriListesi.appendChild(kart);
                                         });
@@ -2330,6 +2447,11 @@
                 anindaGizle(kayitButonu); anindaGizle(copButonu); anindaGizle(cizelgeButonu); anindaGizle(tarihButonu); anindaGizle(musterilerButonu);
                 bugunButonu.textContent = 'Geri Dön'; fadeGosterBlock(bugunBaslik); fadeGoster(bugunContainer);
                 const bugunAdiStr = bugunAdi();
+                if (kapaliGunler.includes(bugunAdiStr)) {
+                    const bosMsg = document.createElement('div');
+                    bosMsg.style.cssText = 'color:var(--gun-ok);padding:20px;text-align:center;font-size:14px;';
+                    bosMsg.textContent = 'Bugün kapalı'; bugunContainer.appendChild(bosMsg);
+                } else {
                 const bugunMusterileri = tarihRandevular[bugunAdiStr] || [];
                 if (bugunMusterileri.length === 0) {
                     const bosMsg = document.createElement('div');
@@ -2347,6 +2469,7 @@
                         bugunContainer.appendChild(kart);
                     });
                 }
+                } // kapali değil else sonu
             }
 
             // MÜŞTERİLER
@@ -2376,7 +2499,7 @@
                                 detay.innerHTML = `<div style="display:flex;flex-direction:column;gap:3px;">
                                     <div style="font-size:15px;font-weight:bold;color:var(--yazi);">${r.gun} — ${r.saat}</div>
                                     <div style="font-size:12px;color:var(--gun-ok);font-weight:normal;">${r.tarih}</div></div>
-                                    <div class="cop-kutusu" onclick="onayla(event, () => musteriRandevuSil('${isim}', ${r.id}))"></div>`;
+                                    <div class="cop-kutusu" onclick="onayla(event, () => musteriRandevuSil('${isim}', ${r.id}), '${isim}\\n${r.gun} ${r.saat}\\nsilinsin mi?')"></div>`;
                                 detayListe.appendChild(detay);
                             });
                             musterilerContainer.appendChild(detayListe);
@@ -2400,7 +2523,7 @@
                         let mesajHtml = randevu.telefon ? `<a href="sms:${randevu.telefon}" class="mesaj-kutusu" onclick="event.stopPropagation()"></a>` : '';
                         kart.innerHTML = `<div class="kart-sol-blok"><span>${randevu.isim}</span>${randevu.gun ? `<span class="kart-tel-no" style="color:var(--gun-ok);">${randevu.gun}</span>` : ''}${telHtml}${randevu.telefon ? `<div style="display:flex;gap:6px;margin-top:4px;">${araHtml}${mesajHtml}</div>` : ''}</div>
                             <div class="kart-sag-blok"><span class="kart-saat"><span class="kart-saat-saat">${randevu.saat}</span>${randevu.tarih ? `<span class="kart-saat-tarih">${randevu.tarih}</span>` : ""}</span>
-                            <div class="cop-kutusu" onclick="onayla(event, () => randevuyuSil(${randevu.id}, 'aktif'))"></div></div>`;
+                            <div class="cop-kutusu" onclick="onayla(event, () => randevuyuSil(${randevu.id}, 'aktif'), '${randevu.isim} — ${randevu.saat}\\nsilinsin mi?')"></div></div>`;
                         aktifContainer.appendChild(kart);
                     });
                 }
