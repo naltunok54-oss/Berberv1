@@ -2298,14 +2298,43 @@
                 }
 
                 const acikGunler = GUNLER.filter(g => !kapaliGunler.includes(g));
+                // Bugünün haftaiçi sırası (Pzt=1 ... Paz=7)
+                const _bugunNo = new Date().getDay() === 0 ? 7 : new Date().getDay();
+                const _gunSirasi = { "Pazartesi":1,"Salı":2,"Çarşamba":3,"Perşembe":4,"Cuma":5,"Cumartesi":6,"Pazar":7 };
+                // Gelecek haftanın başlangıcı
+                const _gelecekHaftaBaslangic = haftaBaslangic(new Date());
+                _gelecekHaftaBaslangic.setDate(_gelecekHaftaBaslangic.getDate() + 7);
+                const gelecekHaftaKey = haftaKey(_gelecekHaftaBaslangic);
+                if (!haftaRandevular[gelecekHaftaKey]) {
+                    haftaRandevular[gelecekHaftaKey] = {};
+                    GUNLER.forEach(g => { haftaRandevular[gelecekHaftaKey][g] = []; });
+                }
+                // Tarih formatlayıcı: DD.MM.YYYY
+                function _formatTarih(d) {
+                    const g2 = String(d.getDate()).padStart(2,'0');
+                    const a2 = String(d.getMonth()+1).padStart(2,'0');
+                    return g2+'.'+a2+'.'+d.getFullYear();
+                }
+
                 acikGunler.forEach(gun => {
+                    const gunNo = _gunSirasi[gun] || 1;
+                    // Bugünden önceki gün mü?
+                    const gecmis = gunNo < _bugunNo;
+                    let gelecekTarihStr = '';
+                    if (gecmis) {
+                        const gd = new Date(_gelecekHaftaBaslangic);
+                        gd.setDate(_gelecekHaftaBaslangic.getDate() + gunNo - 1);
+                        gelecekTarihStr = _formatTarih(gd);
+                    }
                     const gunSatir = document.createElement('div');
                     gunSatir.className = 'tarih-gun-satir' + (acikGun === gun ? ' secili-gun' : '');
-                    gunSatir.innerHTML = `<span>${gun}</span><span class="tarih-gun-ok">${acikGun === gun ? '▲' : '▼'}</span>`;
+                    gunSatir.innerHTML = '<span>' + gun + (gecmis ? '<span style="font-size:11px;font-weight:400;color:var(--gun-ok);margin-left:7px;">' + gelecekTarihStr + '</span>' : '') + '</span><span class="tarih-gun-ok">' + (acikGun === gun ? '▲' : '▼') + '</span>';
                     gunSatir.onclick = () => gunuAc(gun);
                     cizelgeContainer.appendChild(gunSatir);
                     if (acikGun === gun) {
-                        const gunRandevular = tarihRandevular[gun] || [];
+                        // Geçmiş gün → gelecek hafta randevularını göster
+                        const hedefHKey = gecmis ? gelecekHaftaKey : buHaftaKey;
+                        const gunRandevular = (haftaRandevular[hedefHKey] && haftaRandevular[hedefHKey][gun]) ? haftaRandevular[hedefHKey][gun] : [];
                         const saatler = saatListesiUret();
                         saatler.forEach(saatStr => {
                             let bulunan = gunRandevular.find(r => r.saat === saatStr);
@@ -2320,24 +2349,26 @@
                                 satir.style.borderColor = 'rgba(37,211,102,0.18)';
                             }
                             if (bulunan) {
-                                satir.innerHTML = `<span style="cursor:pointer;">${saatStr} — ${bulunan.isim}</span>
-                                    <div style="display:flex;align-items:center;gap:8px;">
-                                        <span class="durum-etiket durum-dolu">Dolu</span>
-                                        <div class="cop-kutusu" id="cizelge-sil-${bulunan.id}"></div>
-                                    </div>`;
+                                let telHtml = bulunan.telefon ? '<span style="font-size:11px;color:var(--gun-ok);margin-left:4px;">' + bulunan.telefon + '</span>' : '';
+                                satir.innerHTML = '<span style="cursor:pointer;">' + saatStr + ' — ' + bulunan.isim + telHtml + '</span><div style="display:flex;align-items:center;gap:8px;"><span class="durum-etiket durum-dolu">Dolu</span><div class="cop-kutusu" id="cizelge-sil-' + bulunan.id + '"></div></div>';
                                 satir.style.cursor = 'pointer';
+                                const _b = bulunan;
                                 satir.onclick = (e) => {
                                     if (e.target.closest('.cop-kutusu') || e.target.closest('.durum-etiket')) return;
-                                    paneliAcSaatle(gun, saatStr, bulunan.id);
+                                    paneliAcSaatle(gun, saatStr, _b.id);
                                 };
                                 satir.querySelector('.cop-kutusu').onclick = (e) => {
-                                    onayla(e, () => randevuyuSil(bulunan.id, aktifRandevular.find(r=>r.id===bulunan.id) ? 'aktif' : 'bitti'), `${bulunan.isim} — ${saatStr}\nsilinsin mi?`);
+                                    const _id = _b.id;
+                                    onayla(e, () => {
+                                        if (hedefHKey !== buHaftaKey) {
+                                            tarihtenSil(gun, _id, hedefHKey);
+                                        } else {
+                                            randevuyuSil(_id, aktifRandevular.find(r=>r.id===_id) ? 'aktif' : 'bitti');
+                                        }
+                                    }, _b.isim + ' — ' + saatStr + '\nsilinsin mi?');
                                 };
                             } else {
-                                satir.innerHTML = `<span>${saatStr}</span>
-                                    <div style="display:flex;align-items:center;gap:8px;">
-                                        <span class="durum-etiket durum-bos">Boş</span>
-                                    </div>`;
+                                satir.innerHTML = '<span>' + saatStr + '</span><div style="display:flex;align-items:center;gap:8px;"><span class="durum-etiket durum-bos">Boş</span></div>';
                                 satir.style.cursor = 'pointer';
                                 satir.onclick = () => paneliAcSaatle(gun, saatStr, null);
                             }
@@ -2394,7 +2425,7 @@
                                             let mesajHtml = randevu.telefon ? `<a href="sms:${randevu.telefon}" class="mesaj-kutusu" onclick="event.stopPropagation()"></a>` : '';
                                             kart.innerHTML = `<div class="kart-sol-blok"><span>${randevu.isim}</span>${telHtml}${randevu.telefon ? `<div style="display:flex;gap:6px;margin-top:4px;">${araHtml}${mesajHtml}</div>` : ''}</div>
                                                 <div class="kart-sag-blok"><span class="kart-saat"><span class="kart-saat-saat">${randevu.saat}</span>${randevu.tarih ? `<span class="kart-saat-tarih">${randevu.tarih}</span>` : ""}</span>
-                                                ${hKey === buHaftaKey ? `<div class="cop-kutusu" onclick="onayla(event, () => tarihtenSil('${gun}', ${randevu.id}, '${hKey}'), '${randevu.isim} — ${randevu.saat}\\nsilinsin mi?')"></div>` : ''}
+                                                <div class="cop-kutusu" onclick="onayla(event, () => tarihtenSil('${gun}', ${randevu.id}, '${hKey}'), '${randevu.isim} — ${randevu.saat}\\nsilinsin mi?')"></div>
                                                 </div>`;
                                             musteriListesi.appendChild(kart);
                                         });
