@@ -2306,7 +2306,7 @@
         // ── INPUT FONKSİYONLARI ──
         function isimBuyukHarf(el) {
             const pos = el.selectionStart;
-            el.value = el.value.replace(/\b\w/g, c => c.toLocaleUpperCase('tr-TR'));
+            el.value = el.value.replace(/(^|\s)\S/g, c => c.toLocaleUpperCase('tr-TR'));
             el.setSelectionRange(pos, pos);
         }
 
